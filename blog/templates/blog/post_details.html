@@ -1,0 +1,238 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}
+    {{ post.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-md col-md-8 mb-4 m-auto">
+        {% include 'partials/messages.html' %}
+        {# Post Content Section START #}
+        <div class="post-content">
+            <div class="mb-3">
+                <h3 class="card-title">{{ post.title }}</h3>
+                <hr/>
+                <div class="w-100 text-muted my-1 d-inline-flex justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ post.created_by.profile_image.url }}"
+                             class="rounded mx-auto me-2" alt="..." style="height: 2.5rem; width: 2.5rem;
+                                 object-fit: cover; object-position: top">
+                        <small class="d-inline-flex flex-column">
+                            <a href="{% url 'user-profile' post.created_by.username %}">
+                                {{ post.created_by.username }}
+                            </a>
+                            <span>{{ post.date_created|date:"d M Y" }} &nbsp{{ post.date_created|time:"H:i" }}</span>
+                        </small>
+                    </div>
+
+                    <div class="d-inline-flex justify-content-between" style="width: 20%">
+                        <a class="h3" target="_blank"
+                           href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a class="h3" target="_blank"
+                           href="https://twitter.com/home?status=I'm%20going%20to%20learn%20to%20Code...%20Come%20build%20an%20web%20apsp%20with%20me!%20%23CFE%20and%20@justinmitchel%20{{ request.build_absolute_uri }}">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        {% if user == post.created_by or user.is_superuser %}
+                            <a class="btn btn-outline-success" href="{% url 'edit-post' post.slug %}">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a class="btn btn-outline-danger" href="{% url 'delete-post' post.slug %}">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr/>
+                <img src="{{ post.header_image.url }}" class="card-img-top"
+                     style="height: 25rem; object-fit: cover; object-position: top" alt="...">
+            </div>
+            <p class="card-text">{{ post.body|safe }}</p>
+
+            <hr/>
+
+            <div class="d-flex justify-content-between">
+                <div>
+                    Tags:
+                    {% for tag in post.tags.all %}
+                        {% if forloop.last %}
+                            <a class="text-decoration-none" href="{% url 'posts-by-tag' tag.name %}">{{ tag.name }}</a>
+                        {% else %}
+                            <a class="text-decoration-none" href="{% url 'posts-by-tag' tag.name %}">{{ tag.name }}</a>,
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    {% if user.is_authenticated and user != post.created_by %}
+                        <form id="rating-form" method="post" action="{% url 'rate-post' slug=post.slug %}">
+                            {% csrf_token %}
+                            <button class="btn {% if liked == True %}btn-primary disabled{% else %} btn-outline-primary"
+                            {% endif %} type="submit" name="like">
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                                <span>{{ likes }}</span>
+                            </button>
+                            <button class="btn {% if liked == False %}btn-danger disabled{% else %} btn-outline-danger"
+                            {% endif %} type="submit" name="dislike">
+                                <i class="bi bi-hand-thumbs-down-fill"></i>
+                                <span>{{ dislikes }}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <div id="rating-form">
+                            <span class="btn btn-primary" style="cursor: default">
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                                <span>{{ likes }}</span>
+                            </span>
+                            <span class="btn btn-danger" style="cursor: default">
+                                <i class="bi bi-hand-thumbs-down-fill"></i>
+                                <span>{{ dislikes }}</span>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <hr/>
+        </div>
+        {# Post Content Section END #}
+
+        {% url 'create-comment' slug=post.slug as comment_submit %}
+
+        {# Comments Section START #}
+        <div class="my-4">
+            <h4 class="card-title fw-bold mb-4"><i class="bi bi-chat-right-text-fill"></i>
+                Comments: {{ comment_count }}</h4>
+            <div class="root-comments-div w-100">
+
+                {# Root Comments Sub-Section START #}
+                {% for comment in root_comments %}
+                    <div id="comment-{{ comment.pk }}" class="card mb-2">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="d-inline-flex align-items-center">
+                                <img src="{{ comment.author.profile_image.url }}"
+                                     class="rounded mx-auto me-2" alt="..." style="height: 2.5rem; width: 2.5rem;
+                             object-fit: cover; object-position: top">
+                                <small class="d-inline-flex flex-column">
+                                    <a class="text-decoration-none fw-bold"
+                                       href="{% url 'user-profile' comment.author.username %}">
+                                        {{ comment.author.username }}
+                                    </a>
+                                    <span>
+                                        {{ comment.date_created|date:"d M Y" }}
+                                        &nbsp{{ comment.date_created|time:"H:i" }}
+                                    </span>
+                                </small>
+                            </div>
+                            {% url 'edit-comment' slug=post.slug comment_id=comment.pk as edit_comment %}
+                            {% if user == comment.author or user.is_superuser %}
+                                <button class="btn btn-outline-success"
+                                        onclick="onCommentEdit(this, '{{ comment.pk }}',
+                                                '{{ edit_comment }}', '{{ csrf_token }}')">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                        <div id="body-wrapper-{{ comment.pk }}" class="card-body">
+                            <p class="card-text">{{ comment.body }}</p>
+                            <div class="d-flex w-100 justify-content-end">
+                                {% if user.is_authenticated %}
+                                    <button class="btn btn-primary"
+                                            onclick="onCommentReply('{{ comment.pk }}', '{{ comment.pk }}',
+                                                    '{{ comment_submit }}', '{{ csrf_token }}')">
+                                        Reply
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {# Root Comments Sub-Section END #}
+
+                    {# Reply Comments Sub-Section START #}
+                    <div class="reply-section mb-3 ms-auto"
+                         style="width: 97%; border-left: rgba(71,128,213,0.53) dotted">
+                        <div class="ms-auto" id="replies-of-{{ comment.pk }}" style="width: 99%">
+                            {% for sub_comment in comment.sub_comments.all %}
+                                <div id="comment-{{ sub_comment.pk }}" class="card mb-2">
+                                    <div class="card-header d-flex justify-content-between">
+                                        <div class="d-inline-flex align-items-center">
+                                            <img src="{{ sub_comment.author.profile_image.url }}"
+                                                 class="rounded mx-auto me-2" alt="..." style="height: 2.5rem; width: 2.5rem;
+                             object-fit: cover; object-position: top">
+                                            <small class="d-inline-flex flex-column">
+                                                <span>
+                                                    <a class="text-decoration-none fw-bold"
+                                                       href="{% url 'user-profile' sub_comment.author.username %}">
+                                                        {{ sub_comment.author.username }}
+                                                    </a>
+                                                    replied to
+                                                    <a class="text-decoration-none"
+                                                       href="{% url 'user-profile' sub_comment.parent_comment.author.username %}">
+                                                        {{ sub_comment.parent_comment.author }}
+                                                    </a>
+                                                </span>
+                                                <span>
+                                                    {{ sub_comment.date_created|date:"d M Y" }}
+                                                    &nbsp{{ sub_comment.date_created|time:"H:i" }}
+                                                </span>
+                                            </small>
+                                        </div>
+                                        {% url 'edit-comment' slug=post.slug comment_id=sub_comment.pk as edit_comment %}
+                                        {% if user == sub_comment.author or user.is_superuser %}
+                                            <button class="btn btn-outline-success"
+                                                    onclick="onCommentEdit(this, '{{ sub_comment.pk }}',
+                                                            '{{ edit_comment }}', '{{ csrf_token }}')">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    <div id="body-wrapper-{{ sub_comment.pk }}" class="card-body">
+                                        <p class="card-text">{{ sub_comment.body }}</p>
+                                        <div class="d-flex w-100 justify-content-end">
+                                            {% if user.is_authenticated %}
+                                                <button class="btn btn-primary"
+                                                        onclick="onCommentReply('{{ sub_comment.pk }}', '{{ comment.pk }}',
+                                                                '{{ comment_submit }}', '{{ csrf_token }}')">
+                                                    Reply
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="write-reply-{{ comment.pk }} ms-auto  d-flex justify-content-end"
+                             style="width: 99%"></div>
+                    </div>
+                    {# Reply Comments Sub-Section END #}
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                    <form id="form-root" class="w-100 d-inline-flex flex-column" method="post"
+                          action="{{ comment_submit }}">
+                        {% csrf_token %}
+                        <label for="{{ root_comment_form.body.id_for_label }}" class="form-label">Add Comment</label>
+                        {{ root_comment_form.body }}
+                        <div class="w-50 mt-3 align-self-end d-inline-flex justify-content-end">
+                            <span id="root-text-counter" class="btn me-3" style="cursor: default;"></span>
+                            <button id="root-btn-submit" type="submit" name="save_comment"
+                                    class="btn btn-outline-primary w-50">Add Comment
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <a class="text-decoration-none fw-bold" href="{% url 'register' %}">Register</a> to leave
+                        comments!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {# Comments Section END #}
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/post_details.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+{% endblock %}

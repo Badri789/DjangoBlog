@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block content %}
+
+    <div class="container w-50 mb-3 d-flex justify-content-start align-items-start">
+        <div class="me-3">
+            <img src="{{ profile_image.url }}"
+                 class="rounded" alt="..." style="height: 7rem; width: 7rem;
+                                 object-fit: cover; object-position: top">
+        </div>
+        <div>
+            <h2 class="text-primary">{{ username }}</h2>
+            <p class="fw-bold">
+                <i class="bi bi-file-text-fill me-1"></i>
+                Posts: {{ post_count }}
+            </p>
+            <p class="fw-bold">
+                <i class="bi bi-chat-left-text-fill me-1"></i>
+                Comments: {{ comment_count }}
+            </p>
+        </div>
+        {% if user.username == username or user.is_superuser %}
+            <div class="ms-auto">
+                <a href="{% url 'edit-profile' username %}" class="btn btn-outline-success"><i
+                        class="bi bi-pencil-fill"></i></a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="container w-50 d-flex justify-content-between">
+        <div class="w-50">
+            <h4 class="mb-3">General Info</h4>
+            <p>First Name: <span class="ms-1">{{ first_name }}</span></p>
+            <p>Last Name: <span class="ms-1">{{ last_name }}</span></p>
+            <p>Date Joined: <span class="ms-1">{{ date_joined|date:"d M Y" }}</span></p>
+            <p>Gender: <span class="ms-1">{{ gender }}</span></p>
+        </div>
+        <div class="w-50">
+            <h4 class="mb-3">About me</h4>
+            <p>{{ user_info }}</p>
+        </div>
+    </div>
+
+{% endblock %}
+
+

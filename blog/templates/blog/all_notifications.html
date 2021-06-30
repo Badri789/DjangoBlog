@@ -1,0 +1,140 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+
+{% block title %}
+    Notifications
+{% endblock %}
+
+{% block content %}
+    <div class="w-75 container">
+        <h3 class="m-auto mb-2">Your Notifications:</h3>
+        <ul class="m-auto ps-0 py-3" style="list-style-type: none">
+            {% for notification in page_obj %}
+                {% url 'notification' notification_id=notification.pk slug=notification.post.slug as notification_url %}
+                {% if notification.type == 1 %}
+                    <li id="notification-type-1" class="mb-2" style="border: 1px solid rgba(160,160,160,0.4)"
+                        onclick="notificationClick('#rating-form')">
+                        <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                           href="{{ notification_url }}">
+                            <img src="{{ notification.from_user.profile_image.url }}"
+                                 class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                            <div class="d-inline-flex flex-column">
+                            <span class="text-wrap">
+                                {{ notification.from_user }} liked your post: <br/>
+                                {{ notification.post.title }}
+                            </span>
+                                <small>{{ notification.date|naturaltime }}</small>
+                            </div>
+                        </a>
+                    </li>
+                {% elif notification.type == 2 %}
+                    <li id="notification-type-2" class="mb-2" style="border: 1px solid rgba(160,160,160,0.4)"
+                        onclick="notificationClick('#rating-form')">
+                        <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                           href="{{ notification_url }}">
+                            <img src="{{ notification.from_user.profile_image.url }}"
+                                 class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                            <div class="d-inline-flex flex-column">
+                            <span class="text-wrap">
+                                {{ notification.from_user }} disliked your post: <br/>
+                                {{ notification.post.title }}
+                            </span>
+                                <small>{{ notification.date|naturaltime }}</small>
+                            </div>
+                        </a>
+                    </li>
+                {% elif notification.type == 3 %}
+                    <li id="notification-type-3" class="mb-2" style="border: 1px solid rgba(160,160,160,0.4)"
+                        onclick="notificationClick('#comment-{{ notification.comment.pk }}')">
+                        <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                           href="{{ notification_url }}">
+                            <img src="{{ notification.from_user.profile_image.url }}"
+                                 class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                            <div class="d-inline-flex flex-column">
+                            <span class="text-wrap">
+                                {{ notification.from_user }} commented on your post: <br/>
+                                {{ notification.post.title }}
+                            </span>
+                                <small>{{ notification.date|naturaltime }}</small>
+                            </div>
+                        </a>
+                    </li>
+                {% elif notification.type == 4 %}
+                    <li id="notification-type-4" class="mb-1" style="border: 1px solid rgba(160,160,160,0.4)"
+                        onclick="notificationClick('#comment-{{ notification.comment.pk }}')">
+                        <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                           href="{{ notification_url }}">
+                            <img src="{{ notification.from_user.profile_image.url }}"
+                                 class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                            <div class="d-inline-flex flex-column">
+                            <span class="text-wrap">
+                                {{ notification.from_user }} replied on your comment on {{ notification.post.title }}:
+                                <br/>
+                                {{ notification.comment.body }}
+                            </span>
+                                <small>{{ notification.date|naturaltime }}</small>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#">First</a></li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for p in page_obj.paginator.page_range %}
+                    {% if p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                        <li class="page-item {% if page_obj.number == p %}active{% endif %}">
+                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}
+
+
+

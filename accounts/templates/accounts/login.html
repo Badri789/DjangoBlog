@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+
+    <div class="container d-flex flex-column align-items-sm-center mb-5">
+        {% include 'partials/messages.html' %}
+        <form class="w-25 m-auto mt-3 mb-3" action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <legend>Log In</legend>
+            <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% for error in form.email.errors %}
+                    <p class="text-danger mt-2">{{ error }}..</p>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                {{ form.password }}
+                {% for error in form.password.errors %}
+                    <p class="text-danger mt-2">{{ error }}..</p>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-outline-primary w-100">Log In</button>
+        </form>
+        <div class="w-25">
+            <a href="" class="d-block text-center text-decoration-none">Forgot Password?</a>
+            <hr class="w-100">
+            <a href="{% url 'register' %}" class="btn btn-outline-success w-100">Register Now</a>
+        </div>
+    </div>
+
+{% endblock %}
+

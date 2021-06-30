@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+
+{% block title %}
+    Blog
+{% endblock %}
+
+{% block content %}
+    {% include 'partials/messages.html' %}
+    <div class="container-md">
+        <div class="row my-3">
+            <div class="col-md d-inline-flex align-content-center">
+                <h1 class="m-auto"><i class="bi bi-bar-chart-fill"></i> Featured Posts</h1>
+            </div>
+        </div>
+        <div class="row">
+            {% for post in featured_posts %}
+                <a class="col-md my-2 text-decoration-none link-dark" href="{% url 'post-details' slug=post.slug %}">
+                    <div class="card m-auto" style="width: 18rem;">
+                        <img src="{{ post.header_image.url }}"
+                             class="card-img-top" style="height: 10rem; object-fit: cover" alt="...">
+                        <div class="card-body">
+                            <p class="card-text">{{ post.title }}</p>
+                            <p class="mb-0 me-2 d-inline">
+                                <i class="bi bi-hand-thumbs-up-fill"></i> {{ post.likes }} &nbsp;
+
+                            </p>
+                            <p class="mb-0 d-inline">
+                                <i class="bi bi-chat-right-text-fill"></i> {{ post.comments }}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div class="row my-3 mt-4">
+            <div class="col-md d-inline-flex align-content-center">
+                <h1 class="m-auto"><i class="bi bi-calendar-minus"></i> Latest Posts</h1>
+            </div>
+        </div>
+        <div class="row">
+            {% for post in latest_posts %}
+                <a class="col-md my-2 text-decoration-none link-dark" href="{% url 'post-details' slug=post.slug %}">
+                    <div class="card m-auto" style="width: 18rem;">
+                        <img src="{{ post.header_image.url }}"
+                             class="card-img-top" style="height: 10rem; object-fit: cover" alt="...">
+                        <div class="card-body">
+                            <p class="card-text">{{ post.title }}</p>
+                            <p class="mb-0 me-2 d-inline">
+                                <i class="bi bi-clock"></i> {{ post.date_created|naturaltime }}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

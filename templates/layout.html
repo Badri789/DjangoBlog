@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+    <link rel="icon" href="{% static 'images/blogo.svg' %}">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+</head>
+<body>
+
+{% include 'partials/navbar.html' %}
+
+{% block content %}
+{% endblock %}
+
+{% include 'partials/footer.html' %}
+
+<script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+<script src="{% static 'js/notification_click.js' %}"></script>
+
+{% block js %}
+{% endblock %}
+
+</body>
+</html>
+
+
+

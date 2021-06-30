@@ -1,0 +1,112 @@
+{% load humanize %}
+
+<style>
+    .not_seen {
+        background-color: rgba(11, 127, 215, 0.36);
+    }
+
+    .not_seen:hover {
+        background-color: rgba(11, 127, 215, 0.6);
+    }
+</style>
+
+<div class="dropdown d-inline-block">
+    <div class="dropdown-toggle"
+         data-bs-toggle="dropdown" aria-expanded="false" id="userDropdownMenu">
+        <i class="bi bi-bell-fill text-white ms-2" style="font-size: 1.3rem">
+            <span class="badge {% if not_seen_count == 0 %}bg-primary{% else %}bg-danger{% endif %}"
+                  style="font-style: normal">
+                {{ not_seen_count }}
+            </span>
+        </i>
+    </div>
+    <ul id="notification-list" class="dropdown-menu dropdown-menu-end py-0"
+        aria-labelledby="userDropdownMenu" style="height: auto; max-height: 300px; overflow-x: hidden">
+        {% for notification in notifications %}
+            {% url 'notification' notification_id=notification.pk slug=notification.post.slug as notification_url %}
+            {% if notification.type == 1 %}
+                <li id="notification-type-1" style="border-bottom: 1px solid rgba(160,160,160,0.4)"
+                    onclick="notificationClick('#rating-form')">
+                    <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                       href="{{ notification_url }}">
+                        <img src="{{ notification.from_user.profile_image.url }}"
+                             class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                        <div class="d-inline-flex flex-column">
+                            <span>
+                                {{ notification.from_user }} liked your post: <br/>
+                                {{ notification.post.title|truncatechars:30 }}
+                            </span>
+                            <small>{{ notification.date|naturaltime }}</small>
+                        </div>
+                    </a>
+                </li>
+            {% elif notification.type == 2 %}
+                <li id="notification-type-2" style="border-bottom: 1px solid rgba(160,160,160,0.4)"
+                    onclick="notificationClick('#rating-form')">
+                    <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                       href="{{ notification_url }}">
+                        <img src="{{ notification.from_user.profile_image.url }}"
+                             class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                        <div class="d-inline-flex flex-column">
+                            <span>
+                                {{ notification.from_user }} disliked your post: <br/>
+                                {{ notification.post.title|truncatechars:30 }}
+                            </span>
+                            <small>{{ notification.date|naturaltime }}</small>
+                        </div>
+                    </a>
+                </li>
+            {% elif notification.type == 3 %}
+                <li id="notification-type-3" style="border-bottom: 1px solid rgba(160,160,160,0.4)"
+                    onclick="notificationClick('#comment-{{ notification.comment.pk }}')">
+                    <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                       href="{{ notification_url }}">
+                        <img src="{{ notification.from_user.profile_image.url }}"
+                             class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                        <div class="d-inline-flex flex-column">
+                            <span>
+                                {{ notification.from_user }} commented on your post: <br/>
+                                {{ notification.post.title|truncatechars:30 }}
+                            </span>
+                            <small>{{ notification.date|naturaltime }}</small>
+                        </div>
+                    </a>
+                </li>
+            {% elif notification.type == 4 %}
+                <li id="notification-type-4" style="border-bottom: 1px solid rgba(160,160,160,0.4)"
+                    onclick="notificationClick('#comment-{{ notification.comment.pk }}')">
+                    <a class="dropdown-item d-flex align-items-center
+                        {% if notification.user_has_seen == False %}not_seen{% endif %}"
+                       href="{{ notification_url }}">
+                        <img src="{{ notification.from_user.profile_image.url }}"
+                             class="rounded me-2 align-self-start" alt="..." style="height: 3rem; width: 3rem;
+                                 object-fit: cover; object-position: top">
+                        <div class="d-inline-flex flex-column">
+                            <span>
+                                {{ notification.from_user }} replied on your comment: <br/>
+                                {{ notification.comment.body|truncatechars:30 }}
+                            </span>
+                            <small>{{ notification.date|naturaltime }}</small>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        <li>
+            <a class="dropdown-item text-primary text-center" href="{% url 'all-notifications' username %}">
+                All Notifications
+            </a>
+        </li>
+    </ul>
+
+</div>
+
+
+
+

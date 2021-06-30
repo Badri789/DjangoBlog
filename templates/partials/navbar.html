@@ -1,0 +1,110 @@
+{% load extra_tags %}
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 p-0">
+    <div class="container-fluid h-100">
+        <a class="navbar-brand" href="{% url 'blog-main' %}">
+            <img src="{% static 'images/blogo.svg' %}" alt="" style="width: 4rem;">
+            Badri's Blog
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse text-center" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                {% url 'blog-main' as url %}
+                <li class="nav-item">
+                    <a class="nav-link  {% if request.path == url %}active{% endif %}" href="{{ url }}">
+                        Home
+                    </a>
+                </li>
+
+                {% url 'all-posts' as url %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == url %}active{% endif %}" href="{{ url }}">
+                        All Posts
+                    </a>
+                </li>
+
+                <div class="nav-item">
+                    {% show_categories %}
+                </div>
+
+                {% if user.is_authenticated %}
+                    {% url 'create-post' as url %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url %}active{% endif %}" href="{{ url }}">
+                            <i class="bi bi-pen-fill"></i>
+                            Create Post
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+            <form class="d-flex me-4" action="{% url 'search-posts' %}">
+                <input class="form-control me-2" name="q" type="search" placeholder="Search Posts" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            {% if user.is_authenticated %}
+                <div class="nav-item">
+                    {% show_notifications %}
+                </div>
+                <div class="btn-group d-inline-flex align-items-center mt-3 mt-lg-0 text-center"
+                     style="cursor: pointer">
+                    <h6 class="text-light mb-0 me-2">{{ user.username }}</h6>
+                    <div class="d-inline-flex justify-content-center align-items-center dropdown-toggle"
+                         data-bs-toggle="dropdown" aria-expanded="false"
+                         id="userDropdownMenu">
+                        <img src="{{ user.profile_image.url }}" class="rounded-circle me-1"
+                             style="height: 3rem; width: 3rem; object-fit: cover; object-position: top" alt="...">
+                        <i class="bi bi-caret-down-fill text-light" style="font-size: 0.8rem"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end text-center py-0"
+                        aria-labelledby="userDropdownMenu">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user-profile' user.username %}">
+                                My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'posts-by-user' user.username %}">
+                                My Posts
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all-notifications' user.username %}">
+                                My Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-left me-1"></i>
+                                Log out
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <ul class="navbar-nav">
+                    {% url 'login' as url %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url %}active{% endif %}" href="{{ url }}">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Log in
+                        </a>
+                    </li>
+                    {% url 'register' as url %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url %}active{% endif %}" href="{{ url }}">
+                            Register
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+
