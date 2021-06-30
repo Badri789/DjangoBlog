@@ -1,3 +1,5 @@
+<p align="center"><a href="https://badriblog.herokuapp.com/" target="_blank"><img src="./static/images/blogo.svg" width="400"></a></p>
+
 ## About Badri's Blog
 
 [Badri's Blog](https://badriblog.herokuapp.com/) is a fully functional blog where you can:
